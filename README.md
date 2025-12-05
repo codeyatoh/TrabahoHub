@@ -1,16 +1,91 @@
-# React + Vite
+# TrabahoHub - Frontend Prototype
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Welcome to **TrabahoHub**! This is a frontend prototype for a job matching platform designed for freelancers and clients in the Philippines. This project demonstrates the user interface and user experience for three different roles: Client, Freelancer, and Admin.
 
-Currently, two official plugins are available:
+## 🛠️ Technology Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+This project is built using modern web technologies:
 
-## React Compiler
+- **HTML5 & CSS3:** For structure and styling.
+- **JavaScript (React):** The main programming language and library used to build the interactive user interface.
+- **Vite:** A tool that makes the project run very fast during development.
+- **Tailwind CSS:** A utility-first CSS framework for styling components quickly and beautifully.
+- **React Router:** For navigating between different pages (like Dashboard, Profile, Settings) without reloading the page.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 📂 Folder Structure
 
-## Expanding the ESLint configuration
+Here is a simple guide to where everything is located:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- **`src/`**: The main folder where all the code lives.
+  - **`assets/`**: Contains images (like user profiles) and other static files.
+  - **`auth/`**: Contains the Login page and logic to detect user roles.
+  - **`components/`**: (If applicable) specific components.
+  - **`context/`**: Contains `UserContext.jsx`, which acts like a "brain" that remembers who is logged in.
+  - **`pages/`**: Contains the main Landing Page.
+  - **`roles/`**: This is where the specific pages for each user type are stored:
+    - **`admin/`**: Pages for the Admin dashboard and user management.
+    - **`client/`**: Pages for Clients to post jobs and view freelancers.
+    - **`freelancer/`**: Pages for Freelancers to find jobs and view their profile.
+  - **`services/`**: Contains `mockData.js`, which holds all the fake data (users, jobs, messages) used in this prototype.
+  - **`shared/`**: Contains components used across the entire app, like the Sidebar, Navbar, and Buttons.
+
+## 🚀 How to Install and Run
+
+Follow these simple steps to get the project running on your computer:
+
+### Prerequisites
+
+Make sure you have **Node.js** installed on your computer.
+
+### Installation Steps
+
+1.  Open your terminal or command prompt.
+2.  Navigate to the project folder (`d:\3rd Year Project\TrabahoHub`).
+3.  Install the necessary dependencies by running:
+    ```bash
+    yarn install
+    ```
+
+### Running the Project
+
+1.  Start the development server by running:
+    ```bash
+    yarn dev
+    ```
+2.  Look for the "Local" URL in the terminal (usually `http://localhost:5173`) and open it in your web browser.
+
+## 🔑 Sample User Credentials (Demo)
+
+You can use these accounts to test the different roles in the application.
+
+### 1. Client Account
+
+Use this account to post jobs and hire freelancers.
+
+- **Name:** Aivy Gonzales
+- **Email:** `aivy@trabahohub.com`
+- **Password:** `client123`
+
+### 2. Freelancer Account
+
+Use this account to browse jobs and view your profile.
+
+- **Name:** Angelito Halmain
+- **Email:** `angelito@trabahohub.com`
+- **Password:** `freelancer123`
+
+### 3. Admin Account
+
+Use this account to manage users and view platform statistics.
+
+- **Name:** Jonathan Rolter Dagondon
+- **Email:** `jonathan@trabahohub.com`
+- **Password:** `admin123`
+
+## 🖼️ Assets and Mockups
+
+The user profile images used in this project are located in the `src/assets/images` folder. These include photos for Aivy, Angelito, Jonathan, and others.
+
+---
+
+_Created for the 3rd Year Project - TrabahoHub_

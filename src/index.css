@@ -1,0 +1,120 @@
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 0%;
+
+    --muted: 0 0% 97%;
+    --muted-foreground: 0 0% 45%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 0%;
+
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 0%;
+
+    --primary: 0 0% 0%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 0 0% 97%;
+    --secondary-foreground: 0 0% 0%;
+
+    --accent: 0 0% 97%;
+    --accent-foreground: 0 0% 0%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --ring: 0 0% 0%;
+
+    --radius: 12px;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  html, body, #root {
+    @apply h-full w-full;
+  }
+  
+  body {
+    @apply bg-white text-black antialiased;
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Caveat', cursive;
+  }
+
+  /* Enhanced Select Dropdown Styling */
+  select option {
+    padding: 12px 16px;
+    transition: background-color 200ms ease-out;
+  }
+
+  select option:hover {
+    background-color: #F8F8F8;
+  }
+
+  select option:checked {
+    background-color: #000000;
+    color: #FFFFFF;
+  }
+
+  /* Smooth scrollbar for select dropdowns */
+  select::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  select::-webkit-scrollbar-track {
+    background: #F8F8F8;
+    border-radius: 4px;
+  }
+
+  select::-webkit-scrollbar-thumb {
+    background: #D1D5DB;
+    border-radius: 4px;
+    transition: background-color 200ms ease-out;
+  }
+
+  select::-webkit-scrollbar-thumb:hover {
+    background: #9CA3AF;
+  }
+}
+
+@layer utilities {
+  .font-caveat {
+    font-family: 'Caveat', cursive;
+  }
+  
+  .font-poppins {
+    font-family: 'Poppins', sans-serif;
+  }
+
+  /* Fade In Animation */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fadeIn {
+    animation: fadeIn 300ms ease-out;
+  }
+}
