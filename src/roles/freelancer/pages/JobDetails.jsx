@@ -1,59 +1,204 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { Sidebar } from '../../../shared/components/Sidebar'
 import { BottomNav } from '../../../shared/components/BottomNav'
 import { RoundedCard } from '../../../shared/components/RoundedCard'
+import { getJobById } from '../../../services/mockData'
+import { useUser } from '../../../context/UserContext'
+import { MilestoneList } from '../components/MilestoneList'
+import { WorkSubmission } from '../components/WorkSubmission'
+import { toast } from 'react-toastify'
 import {
   FiArrowLeft,
   FiMapPin,
   FiClock,
   FiUser,
+  FiCheckCircle,
+  FiList,
+  FiUpload,
 } from 'react-icons/fi'
-const mockJob = {
-  id: '1',
-  title: 'Build a sari-sari store inventory app',
-  description: `Looking for an experienced mobile developer to build a simple inventory management app for my sari-sari store.
 
-Requirements:
-- Track products and quantities
-- Record sales and expenses
-- Generate simple reports
-- Work offline and sync when connected
-- Simple and easy to use interface
-
-The app should be in Filipino/Taglish for easy understanding.`,
-  budget: '₱15,000',
-  budgetType: 'Fixed Price',
-  deadline: 'March 30, 2024',
-  posted: '1 hour ago',
-  client: {
-    name: 'Carlo Mendoza',
-    location: 'Quezon City',
-    memberSince: 'January 2023',
-    jobsPosted: 5,
-    totalSpent: '₱45,000',
-  },
-  skills: ['React Native', 'Firebase', 'Offline Storage', 'Mobile Development'],
-  category: 'Web Development',
-}
-export function FreelancerJobDetails() {
+export default function FreelancerJobDetails() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { currentUser } = useUser()
+  const [job, setJob] = useState(null)
+  
+  // Tab state for Workroom
+  const [activeTab, setActiveTab] = useState('overview')
+
+  // Bidding state
   const [bidAmount, setBidAmount] = useState('')
   const [deliveryTime, setDeliveryTime] = useState('')
   const [proposal, setProposal] = useState('')
+
+  useEffect(() => {
+    // In a real app, this would be an async API call
+    const jobData = getJobById(id)
+    if (jobData) {
+      setJob(jobData)
+    }
+  }, [id])
+
+  if (!job) {
+    return <div>Loading...</div>
+  }
+
+  // Determine if the current freelancer is hired for this job
+  const isHired = job.hiredFreelancerId === currentUser?.id
+
+  // Bidding Handler
   const handleSubmitBid = (e) => {
     e.preventDefault()
-    // Mock submit
+    toast.success('Bid submitted successfully!')
     navigate('/freelancer/dashboard')
   }
+
+  // Workroom Tabs
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'overview':
+        return (
+          <div className="space-y-6">
+            <div className="prose max-w-none">
+              <h3 className="font-caveat text-xl font-bold text-black mb-2">Description</h3>
+              <p className="font-poppins text-gray-700 whitespace-pre-line leading-relaxed">
+                {job.description}
+              </p>
+            </div>
+            
+            <div>
+              <h3 className="font-caveat text-xl font-bold text-black mb-3">Skills Required</h3>
+              <div className="flex flex-wrap gap-2">
+                {job.skills.map((skill) => (
+                  <span
+                    key={skill}
+                    className="px-3 py-1 bg-[#F8F8F8] rounded-[8px] font-poppins text-xs text-gray-700"
+                  >
+                    {skill}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        )
+      case 'milestones':
+        return <MilestoneList milestones={job.milestones} />
+      case 'submission':
+        return <WorkSubmission jobId={job.id} />
+      default:
+        return null
+    }
+  }
+
+  // Render Workroom Layout
+  if (isHired) {
+    return (
+      <div className="min-h-screen bg-[#F8F8F8] flex">
+        <Sidebar role="freelancer" />
+        <main className="flex-1 lg:ml-0 pb-20 lg:pb-0">
+          <div className="max-w-6xl mx-auto px-4 py-8">
+            <Link
+              to="/freelancer/my-jobs"
+              className="inline-flex items-center font-poppins text-sm text-gray-600 hover:text-black mb-6"
+            >
+              <FiArrowLeft className="w-4 h-4 mr-2" />
+              Back to My Jobs
+            </Link>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2 space-y-6">
+                <RoundedCard className="p-0 overflow-hidden">
+                  <div className="p-6 lg:p-8 bg-black text-white">
+                    <div className="flex justify-between items-start mb-4">
+                      <span className="px-3 py-1 bg-white/20 rounded-full text-xs font-poppins backdrop-blur-sm">
+                        Active Contract
+                      </span>
+                      <span className="font-caveat text-2xl font-bold">
+                        {job.budget}
+                      </span>
+                    </div>
+                    <h1 className="font-caveat text-3xl font-bold mb-2">
+                      {job.title}
+                    </h1>
+                    <div className="flex items-center space-x-4 text-gray-300 font-poppins text-sm">
+                       <span className="flex items-center">
+                         <FiUser className="w-4 h-4 mr-1" />
+                         {job.clientName}
+                       </span>
+                       <span className="flex items-center">
+                         <FiClock className="w-4 h-4 mr-1" />
+                         Due: {job.deadline}
+                       </span>
+                    </div>
+                  </div>
+
+                  {/* Tabs */}
+                  <div className="flex border-b border-[#EDEDED] px-6 lg:px-8 pt-4">
+                     {[
+                       { id: 'overview', label: 'Overview', icon: FiList },
+                       { id: 'milestones', label: 'Milestones', icon: FiCheckCircle },
+                       { id: 'submission', label: 'Submit Work', icon: FiUpload },
+                     ].map((tab) => (
+                       <button
+                         key={tab.id}
+                         onClick={() => setActiveTab(tab.id)}
+                         className={`flex items-center mr-8 pb-4 font-poppins text-sm font-medium transition-colors border-b-2 ${
+                           activeTab === tab.id
+                             ? 'border-black text-black'
+                             : 'border-transparent text-gray-500 hover:text-gray-700'
+                         }`}
+                       >
+                         <tab.icon className="w-4 h-4 mr-2" />
+                         {tab.label}
+                       </button>
+                     ))}
+                  </div>
+
+                  <div className="p-6 lg:p-8">
+                    {renderTabContent()}
+                  </div>
+                </RoundedCard>
+              </div>
+
+              {/* Sidebar Info */}
+              <div className="lg:col-span-1 space-y-6">
+                <RoundedCard className="p-6">
+                   <h3 className="font-caveat text-xl font-bold text-black mb-4">Contract Status</h3>
+                   <div className="space-y-4">
+                     <div>
+                       <div className="flex justify-between text-sm font-poppins mb-1">
+                         <span className="text-gray-500">Project Budget</span>
+                         <span className="font-medium text-black">{job.budget}</span>
+                       </div>
+                       <div className="flex justify-between text-sm font-poppins mb-1">
+                         <span className="text-gray-500">Escrow</span>
+                         <span className="text-green-600 font-medium">{job.escrowStatus === 'funded' ? 'Funded' : 'Unfunded'}</span>
+                       </div>
+                     </div>
+                     <div className="pt-4 border-t border-[#EDEDED]">
+                        <p className="text-xs text-gray-500 font-poppins">
+                          Payments are released upon milestone approval.
+                        </p>
+                     </div>
+                   </div>
+                </RoundedCard>
+              </div>
+            </div>
+          </div>
+        </main>
+        <BottomNav role="freelancer" />
+      </div>
+    )
+  }
+
+  // Default Bidding View (Existing Logic)
   return (
     <div className="min-h-screen bg-[#F8F8F8] flex">
       <Sidebar role="freelancer" />
 
       <main className="flex-1 lg:ml-0 pb-20 lg:pb-0">
         <div className="max-w-6xl mx-auto px-4 py-8">
-          {/* Back Button */}
           <Link
             to="/freelancer/browse-jobs"
             className="inline-flex items-center font-poppins text-sm text-gray-600 hover:text-black mb-6"
@@ -63,35 +208,36 @@ export function FreelancerJobDetails() {
           </Link>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Job Details */}
             <div className="lg:col-span-2 space-y-6">
               <RoundedCard className="p-6 lg:p-8">
                 <h1 className="font-caveat text-3xl font-bold text-black mb-4">
-                  {mockJob.title}
+                  {job.title}
                 </h1>
 
                 <div className="flex flex-wrap items-center gap-4 text-gray-500 mb-6">
-                  <span className="flex items-center font-poppins text-sm">
-                    <FiMapPin className="w-4 h-4 mr-1" />
-                    {mockJob.client.location}
-                  </span>
+                  {job.client?.location && (
+                    <span className="flex items-center font-poppins text-sm">
+                      <FiMapPin className="w-4 h-4 mr-1" />
+                      {job.client.location}
+                    </span>
+                  )}
                   <span className="flex items-center font-poppins text-sm">
                     <FiClock className="w-4 h-4 mr-1" />
-                    Posted {mockJob.posted}
+                    Posted {job.posted}
                   </span>
                   <span className="px-3 py-1 bg-[#F8F8F8] rounded-[8px] font-poppins text-xs">
-                    {mockJob.category}
+                    {job.category}
                   </span>
                 </div>
 
                 <div className="prose max-w-none mb-6">
                   <p className="font-poppins text-gray-700 whitespace-pre-line leading-relaxed">
-                    {mockJob.description}
+                    {job.description}
                   </p>
                 </div>
 
                 <div className="flex flex-wrap gap-2 mb-6">
-                  {mockJob.skills.map((skill) => (
+                  {job.skills.map((skill) => (
                     <span
                       key={skill}
                       className="px-3 py-1 bg-[#F8F8F8] rounded-[8px] font-poppins text-xs text-gray-700"
@@ -107,10 +253,10 @@ export function FreelancerJobDetails() {
                       Budget
                     </p>
                     <p className="font-caveat text-xl font-bold text-black">
-                      {mockJob.budget}
+                      {job.budget}
                     </p>
                     <p className="font-poppins text-xs text-gray-500">
-                      {mockJob.budgetType}
+                      {job.budgetType}
                     </p>
                   </div>
                   <div>
@@ -118,7 +264,7 @@ export function FreelancerJobDetails() {
                       Deadline
                     </p>
                     <p className="font-poppins text-sm font-medium text-black">
-                      {mockJob.deadline}
+                      {job.deadline}
                     </p>
                   </div>
                 </div>
@@ -188,7 +334,7 @@ export function FreelancerJobDetails() {
               </RoundedCard>
             </div>
 
-            {/* Client Info */}
+            {/* Client Info (Bidding View Only) */}
             <div className="lg:col-span-1">
               <RoundedCard className="p-6">
                 <h3 className="font-caveat text-xl font-bold text-black mb-4">
@@ -200,39 +346,25 @@ export function FreelancerJobDetails() {
                   </div>
                   <div>
                     <p className="font-poppins text-sm font-medium text-black">
-                      {mockJob.client.name}
+                      {job.clientName || 'Client'}
                     </p>
                     <p className="font-poppins text-xs text-gray-500">
-                      {mockJob.client.location}
+                      {job.client?.location || 'Philippines'}
                     </p>
                   </div>
                 </div>
-                <div className="space-y-3 pt-4 border-t border-[#EDEDED]">
-                  <div className="flex justify-between">
-                    <span className="font-poppins text-xs text-gray-500">
-                      Member since
-                    </span>
-                    <span className="font-poppins text-xs text-black">
-                      {mockJob.client.memberSince}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="font-poppins text-xs text-gray-500">
-                      Jobs posted
-                    </span>
-                    <span className="font-poppins text-xs text-black">
-                      {mockJob.client.jobsPosted}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="font-poppins text-xs text-gray-500">
-                      Total spent
-                    </span>
-                    <span className="font-poppins text-xs text-black">
-                      {mockJob.client.totalSpent}
-                    </span>
-                  </div>
-                </div>
+                {job.client && (
+                    <div className="space-y-3 pt-4 border-t border-[#EDEDED]">
+                    <div className="flex justify-between">
+                        <span className="font-poppins text-xs text-gray-500">
+                        Member since
+                        </span>
+                        <span className="font-poppins text-xs text-black">
+                        {job.client.memberSince || '2023'}
+                        </span>
+                    </div>
+                    </div>
+                )}
               </RoundedCard>
             </div>
           </div>
@@ -243,5 +375,3 @@ export function FreelancerJobDetails() {
     </div>
   )
 }
-
-export default FreelancerJobDetails;

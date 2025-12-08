@@ -21,11 +21,14 @@ import ClientSettings from './roles/client/pages/Settings'
 
 // Freelancer Pages
 import FreelancerDashboard from './roles/freelancer/pages/Dashboard'
+import FreelancerMyJobs from './roles/freelancer/pages/MyJobs'
 import FreelancerBrowseJobs from './roles/freelancer/pages/BrowseJobs'
 import FreelancerProfile from './roles/freelancer/pages/Profile'
 import FreelancerSettings from './roles/freelancer/pages/Settings'
 import FreelancerNotifications from './roles/freelancer/pages/Notifications'
+import FreelancerJobDetails from './roles/freelancer/pages/JobDetails'
 import FreelancerMessages from './roles/freelancer/pages/Messages'
+import FreelancerEarnings from './roles/freelancer/pages/Earnings'
 
 // Admin Pages
 import { AdminDashboard } from './roles/admin/pages/Dashboard'
@@ -84,12 +87,16 @@ function App() {
           <Route path="/freelancer/*" element={
             <ProtectedRoute allowedRoles={['freelancer']}>
               <Routes>
+
                 <Route path="dashboard" element={<FreelancerDashboard />} />
+                <Route path="earnings" element={<FreelancerEarnings />} />
+                <Route path="my-jobs" element={<FreelancerMyJobs />} />
                 <Route path="browse-jobs" element={<FreelancerBrowseJobs />} />
                 <Route path="profile" element={<FreelancerProfile />} />
                 <Route path="settings" element={<FreelancerSettings />} />
                 <Route path="notifications" element={<FreelancerNotifications />} />
                 <Route path="messages" element={<FreelancerMessages />} />
+                <Route path="job/:id" element={<FreelancerJobDetails />} />
               </Routes>
             </ProtectedRoute>
           } />

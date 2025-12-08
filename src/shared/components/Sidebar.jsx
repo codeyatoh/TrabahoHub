@@ -13,6 +13,8 @@ import {
   FiSettings,
   FiLogOut,
   FiAlertCircle,
+  FiCheckCircle,
+  FiDollarSign,
 } from 'react-icons/fi'
 import PropTypes from 'prop-types'
 
@@ -72,6 +74,16 @@ export function Sidebar({ role }) {
             icon: FiHome,
             label: 'Dashboard',
             href: '/freelancer/dashboard',
+          },
+          {
+            icon: FiCheckCircle,
+            label: 'My Jobs',
+            href: '/freelancer/my-jobs',
+          },
+          {
+            icon: FiDollarSign,
+            label: 'Earnings',
+            href: '/freelancer/earnings',
           },
           {
             icon: FiBriefcase,
@@ -135,16 +147,16 @@ export function Sidebar({ role }) {
   const navItems = getNavItems()
 
   return (
-    <aside className="hidden lg:flex flex-col w-64 bg-white border-r border-[#EDEDED] min-h-screen">
+    <aside className="hidden lg:flex flex-col w-64 bg-white border-r border-[#EDEDED] h-screen sticky top-0">
       {/* Logo */}
-      <div className="p-6 border-b border-[#EDEDED]">
+      <div className="p-6 border-b border-[#EDEDED] flex-shrink-0">
         <Link to="/" className="font-caveat text-2xl font-bold text-black">
           ᜆ᜔ᜇᜊᜑᜓᜑᜓᜊ᜔
         </Link>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-4">
+      <nav className="flex-1 p-4 overflow-y-auto custom-scrollbar">
         <ul className="space-y-2">
           {navItems.map((item) => {
             const isActive = location.pathname === item.href
