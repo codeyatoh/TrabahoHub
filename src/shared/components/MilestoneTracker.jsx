@@ -51,72 +51,96 @@ export function MilestoneTracker({
 
   return (
     <div className="space-y-4">
-      {milestones.map((milestone, index) => {
-        const StatusIcon = getStatusIcon(milestone.status)
-        return (
-          <RoundedCard key={milestone.id} className="p-6">
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex items-start space-x-4">
-                <div
-                  className={`w-8 h-8 rounded-full bg-[#F8F8F8] flex items-center justify-center ${getStatusColor(milestone.status)}`}
-                >
-                  <StatusIcon className="w-5 h-5" />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center space-x-3 mb-1">
-                    <h3 className="font-poppins text-sm font-medium text-black">
-                      Milestone {index + 1}: {milestone.title}
-                    </h3>
-                    <span
-                      className={`px-2 py-1 rounded-[6px] font-poppins text-xs ${milestone.status === 'approved' ? 'bg-green-100 text-green-800' : milestone.status === 'completed' ? 'bg-blue-100 text-blue-800' : milestone.status === 'in-progress' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-600'}`}
-                    >
-                      {getStatusText(milestone.status)}
-                    </span>
-                  </div>
-                  <p className="font-poppins text-xs text-gray-600 mb-2">
-                    {milestone.description}
-                  </p>
-                  <p className="font-poppins text-xs text-gray-500">
-                    Due: {milestone.dueDate}
-                  </p>
-                </div>
-              </div>
-              <div className="text-right">
-                <p className="font-caveat text-xl font-bold text-black">
-                  {milestone.amount}
-                </p>
-              </div>
-            </div>
-
-            {/* Actions */}
-            {userRole === 'client' && milestone.status === 'completed' && (
-              <div className="flex gap-3 pt-4 border-t border-[#EDEDED]">
-                <button
-                  onClick={() => onApprove && onApprove(milestone.id)}
-                  className="flex-1 py-2 bg-green-500 text-white font-poppins text-sm rounded-[10px] hover:bg-green-600 transition-colors"
-                >
-                  Approve & Release Payment
-                </button>
-                <button className="flex-1 py-2 bg-[#F8F8F8] text-black font-poppins text-sm rounded-[10px] border border-[#EDEDED] hover:bg-[#EDEDED] transition-colors">
-                  Request Revision
-                </button>
-              </div>
-            )}
-
-            {userRole === 'freelancer' &&
-              milestone.status === 'in-progress' && (
-                <div className="pt-4 border-t border-[#EDEDED]">
-                  <button
-                    onClick={() => onSubmit && onSubmit(milestone.id)}
-                    className="w-full py-2 bg-black text-white font-poppins text-sm rounded-[10px] hover:bg-gray-800 transition-colors"
+      {milestones && milestones.length > 0 ? (
+        milestones.map((milestone, index) => {
+          const StatusIcon = getStatusIcon(milestone.status)
+          return (
+            <RoundedCard key={milestone.id} className="p-6">
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-start space-x-4">
+                  <div
+                    className={`w-8 h-8 rounded-full bg-[#F8F8F8] flex items-center justify-center ${getStatusColor(milestone.status)}`}
                   >
-                    Submit for Review
+                    <StatusIcon className="w-5 h-5" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-3 mb-1">
+                      <h3 className="font-poppins text-sm font-medium text-black">
+                        Milestone {index + 1}: {milestone.title}
+                      </h3>
+                      <span
+                        className={`px-2 py-1 rounded-[6px] font-poppins text-xs ${milestone.status === 'approved' ? 'bg-green-100 text-green-800' : milestone.status === 'completed' ? 'bg-blue-100 text-blue-800' : milestone.status === 'in-progress' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-600'}`}
+                      >
+                        {getStatusText(milestone.status)}
+                      </span>
+                    </div>
+                    <p className="font-poppins text-xs text-gray-600 mb-2">
+                      {milestone.description}
+                    </p>
+                    <p className="font-poppins text-xs text-gray-500">
+                      Due: {milestone.dueDate}
+                    </p>
+                  </div>
+                </div>
+              <div className="text-right">
+                  <p className="font-caveat text-xl font-bold text-black">
+                    {milestone.amount}
+                  </p>
+                </div>
+              </div>
+
+              {/* Submission Proof */}
+              {milestone.submission && (
+                <div className="mb-4 bg-gray-50 p-3 rounded-[8px] border border-gray-200">
+                  <h4 className="font-poppins text-xs font-semibold text-black mb-1">
+                    Submission from Freelancer
+                  </h4>
+                  <p className="font-poppins text-xs text-gray-600 mb-2">
+                    "{milestone.submission.note}"
+                  </p>
+                  <a 
+                    href={milestone.submission.link} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:underline text-xs font-poppins font-medium flex items-center"
+                  >
+                     View Proof (External Link)
+                  </a>
+                </div>
+              )}
+
+              {/* Actions */}
+              {userRole === 'client' && milestone.status === 'completed' && (
+                <div className="flex gap-3 pt-4 border-t border-[#EDEDED]">
+                  <button
+                    onClick={() => onApprove && onApprove(milestone.id)}
+                    className="flex-1 py-2 bg-green-500 text-white font-poppins text-sm rounded-[10px] hover:bg-green-600 transition-colors"
+                  >
+                    Approve & Release Payment
+                  </button>
+                  <button className="flex-1 py-2 bg-[#F8F8F8] text-black font-poppins text-sm rounded-[10px] border border-[#EDEDED] hover:bg-[#EDEDED] transition-colors">
+                    Request Revision
                   </button>
                 </div>
               )}
-          </RoundedCard>
-        )
-      })}
+
+              {userRole === 'freelancer' &&
+                milestone.status === 'in-progress' && (
+                  <div className="pt-4 border-t border-[#EDEDED]">
+                    <button
+                      onClick={() => onSubmit && onSubmit(milestone.id)}
+                      className="w-full py-2 bg-black text-white font-poppins text-sm rounded-[10px] hover:bg-gray-800 transition-colors"
+                    >
+                      Submit for Review
+                    </button>
+                  </div>
+                )}
+            </RoundedCard>
+          )
+        })
+      ) : (
+        <p className="text-gray-500 font-poppins text-sm italic">No milestones defined for this project.</p>
+      )}
     </div>
   )
 }

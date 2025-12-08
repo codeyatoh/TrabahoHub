@@ -38,9 +38,9 @@ export function Sidebar({ role }) {
             href: '/client/dashboard',
           },
           {
-            icon: FiPlusCircle,
-            label: 'Post Job',
-            href: '/client/post-job',
+            icon: FiBriefcase,
+            label: 'Your Jobs',
+            href: '/client/jobs',
           },
           {
             icon: FiFolder,

@@ -14,6 +14,9 @@ import {
   FiAlertCircle,
   FiUser,
   FiMessageSquare,
+  FiStar,
+  FiAward,
+  FiTrendingDown,
 } from 'react-icons/fi'
 
 import { useUser } from '../../../context/UserContext'
@@ -22,7 +25,7 @@ import { deleteJob } from '../../../services/mockData'
 import { PostJobModal } from '../../../shared/components/PostJobModal'
 import { FiEdit2, FiTrash2, FiPlus } from 'react-icons/fi'
 
-export function Projects() {
+export function ClientJobs() {
   const { currentUser } = useUser()
   const [projects, setProjects] = useState([])
   const [selectedProject, setSelectedProject] = useState(null)
@@ -41,19 +44,18 @@ export function Projects() {
   // Load projects on mount
   React.useEffect(() => {
     if (currentUser?.id) {
-      // Filter for Active Projects only (In Progress or Completed)
-      // "makikita lang jan yung mga may na assign ng freelancer"
-      const activeProjects = getJobsByClientId(currentUser.id).filter(
-        job => job.status === 'in-progress' || job.status === 'completed' || job.hiredFreelancerId
+      // Filter for "Newly Posted" / Bidding jobs only (Active, No Freelancer)
+      const activeJobs = getJobsByClientId(currentUser.id).filter(
+        job => job.status === 'active'
       )
-      setProjects(activeProjects)
-      if (activeProjects.length > 0 && !selectedProject) {
-        setSelectedProject(activeProjects[0])
-      } else if (activeProjects.length === 0) {
+      setProjects(activeJobs)
+      if (activeJobs.length > 0 && !selectedProject) {
+        setSelectedProject(activeJobs[0])
+      } else if (activeJobs.length === 0) {
         setSelectedProject(null)
       }
     }
-  }, [currentUser, isPostJobModalOpen]) // Reload when modal closes (job added/edited)
+  }, [currentUser, isPostJobModalOpen])
 
   const calculateProgress = (project) => {
     if (!project.milestones || project.milestones.length === 0) return 0
@@ -81,7 +83,7 @@ export function Projects() {
       variant: 'danger',
       confirmLabel: 'Delete',
       onConfirm: () => {
-         if (deleteJob(jobId)) {
+        if (deleteJob(jobId)) {
           const updatedProjects = projects.filter(p => p.id !== jobId)
           setProjects(updatedProjects)
           if (selectedProject?.id === jobId) {
@@ -91,25 +93,37 @@ export function Projects() {
       }
     })
   }
+  /* Funding Logic */
+  const handleFundProject = () => {
+    setConfirmModal({
+      isOpen: true,
+      title: 'Fund Project',
+      message: 'Proceed to fund this project? (Simulated Payment)',
+      variant: 'primary',
+      confirmLabel: 'Fund',
+      onConfirm: () => {
+        toast.success('Project funded successfully! Amount is now in Escrow.')
+        const updatedProject = { ...selectedProject, escrowStatus: 'funded' }
+        setProjects(projects.map(p => p.id === selectedProject.id ? updatedProject : p))
+        setSelectedProject(updatedProject)
+      }
+    })
+  }
 
   const handleApproveMilestone = (milestoneId) => {
     if (!selectedProject) return
 
-    // Find the milestone index
     const milestoneIndex = selectedProject.milestones.findIndex(m => m.id === milestoneId)
     if (milestoneIndex === -1) return
 
-    // Create updated milestones array
     const updatedMilestones = [...selectedProject.milestones]
     updatedMilestones[milestoneIndex] = {
       ...updatedMilestones[milestoneIndex],
       status: 'approved'
     }
 
-    // Update in Mock Data
     updateJob(selectedProject.id, { milestones: updatedMilestones })
 
-    // Update Local State
     const updatedProject = { ...selectedProject, milestones: updatedMilestones, progress: calculateProgress({ ...selectedProject, milestones: updatedMilestones }) }
     setProjects(projects.map(p => p.id === selectedProject.id ? updatedProject : p))
     setSelectedProject(updatedProject)
@@ -156,13 +170,16 @@ export function Projects() {
       <main className="flex-1 lg:ml-0 pb-20 lg:pb-0">
         <div className="max-w-7xl mx-auto px-4 py-8">
           {/* Header */}
-          <div className="mb-8">
-            <h1 className="font-caveat text-4xl font-bold text-black mb-2">
-              Active Contracts
-            </h1>
-            <p className="font-poppins text-gray-600">
-              Track progress, review submissions, and approve milestones
-            </p>
+          <div className="mb-8 flex justify-between items-end">
+            <div>
+              <h1 className="font-caveat text-4xl font-bold text-black mb-2">
+                Your Posted Jobs
+              </h1>
+              <p className="font-poppins text-gray-600">
+                Manage your job postings, edit details, and review bids.
+              </p>
+            </div>
+            {/* Post Job Button removed as per request (moved to Dashboard) */}
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -170,7 +187,7 @@ export function Projects() {
             <div className="lg:col-span-1">
               <RoundedCard className="p-4">
                 <h2 className="font-poppins text-sm font-semibold text-black mb-4">
-                  Active Projects ({projects.length})
+                  All Jobs ({projects.length})
                 </h2>
                 <div className="space-y-2">
                   {projects.map((project) => {
@@ -182,7 +199,23 @@ export function Projects() {
                         onClick={() => setSelectedProject(project)}
                         className={`w-full text-left p-4 rounded-[10px] transition-all group relative ${selectedProject?.id === project.id ? 'bg-black text-white' : 'bg-[#F8F8F8] hover:bg-[#EDEDED]'}`}
                       >
-                        <div className="flex items-start justify-between mb-2 pr-2">
+                         {/* Edit/Delete Actions (Visible on Hover) */}
+                         <div className={`absolute top-2 right-2 flex space-x-1 ${selectedProject?.id === project.id ? 'text-white' : 'text-gray-500'} opacity-0 group-hover:opacity-100 transition-opacity`}>
+                            <div 
+                              onClick={(e) => handleEditJob(e, project)}
+                              className="p-1 hover:bg-gray-700/20 rounded cursor-pointer"
+                            >
+                              <FiEdit2 className="w-3 h-3" />
+                            </div>
+                            <div
+                              onClick={(e) => handleDeleteJob(e, project.id)}
+                              className="p-1 hover:bg-red-500/20 text-red-500 rounded cursor-pointer"
+                            >
+                              <FiTrash2 className="w-3 h-3" />
+                            </div>
+                         </div>
+
+                        <div className="flex items-start justify-between mb-2 pr-12">
                           <h3 className="font-poppins text-sm font-medium line-clamp-2">
                             {project.title}
                           </h3>
@@ -199,7 +232,7 @@ export function Projects() {
                         <p
                           className={`font-poppins text-xs mb-2 ${selectedProject?.id === project.id ? 'text-gray-300' : 'text-gray-500'}`}
                         >
-                          Freelancer: <span className="font-bold">{project.freelancer}</span>
+                          {project.freelancer || 'No Freelancer Assigned'}
                         </p>
                         
                         <div className="flex items-center justify-between">
@@ -224,9 +257,10 @@ export function Projects() {
             </div>
 
             {/* Project Details */}
-            <div className="lg:col-span-2 space-y-6">
+            <div className="lg:col-span-2">
               {selectedProject ? (
-                <>
+
+                <div className="space-y-6">
                   {/* Project Info */}
                   <RoundedCard className="p-6">
                     <div className="flex items-start justify-between mb-6">
@@ -254,7 +288,7 @@ export function Projects() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4 mb-6">
+                    <div className="grid grid-cols-2 gap-4">
                       <div>
                         <p className="font-poppins text-xs text-gray-500 mb-1">
                           Total Budget
@@ -272,45 +306,102 @@ export function Projects() {
                         </p>
                       </div>
                     </div>
-
-                    <div className="flex gap-3">
-                      <Link
-                        to="/client/messages"
-                        className="flex-1 py-2 bg-black text-white font-poppins text-sm rounded-[10px] hover:bg-gray-800 transition-colors flex items-center justify-center"
-                      >
-                        <FiMessageSquare className="w-4 h-4 mr-2" />
-                        Message Freelancer
-                      </Link>
-                      {selectedProject.status === 'completed' && (
-                        <button
-                          onClick={() => setShowReviewModal(true)}
-                          className="flex-1 py-2 bg-[#F8F8F8] text-black font-poppins text-sm rounded-[10px] border border-[#EDEDED] hover:bg-[#EDEDED] transition-colors"
-                        >
-                          Leave Review
-                        </button>
-                      )}
-                    </div>
                   </RoundedCard>
 
                   {/* Escrow Status */}
                   <EscrowStatus
                     status={selectedProject.escrowStatus || 'not-funded'}
                     amount={selectedProject.budget}
-                    showActions={false}
+                    showActions={true}
+                    onFund={handleFundProject}
                   />
 
-                  {/* Milestones */}
+                  {/* Bids or Milestones */}
                   <div>
-                    <h3 className="font-caveat text-2xl font-bold text-black mb-4">
-                      Project Milestones
-                    </h3>
-                    <MilestoneTracker
-                      milestones={selectedProject.milestones || []}
-                      onApprove={handleApproveMilestone}
-                      userRole="client"
-                    />
+                    {selectedProject.status === 'active' ? (
+                       <div>
+                        <h3 className="font-caveat text-2xl font-bold text-black mb-4">
+                          Received Bids ({selectedProject.bids ? selectedProject.bids.length : 0})
+                        </h3>
+                        <div className="space-y-4">
+                        {selectedProject.bids && selectedProject.bids.length > 0 ? (
+                            selectedProject.bids.map((bid, index) => (
+                              <RoundedCard key={bid.id} className="p-6">
+                                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between">
+                                  <div className="flex items-start space-x-4 mb-4 sm:mb-0">
+                                    <div className="w-12 h-12 bg-[#F8F8F8] rounded-full flex items-center justify-center font-caveat text-xl">
+                                      {bid.freelancerName ? bid.freelancerName.charAt(0) : '?'}
+                                    </div>
+                                    <div>
+                                      <h3 className="font-caveat text-xl font-semibold text-black">
+                                        {bid.freelancerName}
+                                      </h3>
+                                      <p className="font-poppins text-sm text-gray-500">
+                                        {bid.location}
+                                      </p>
+                                      <div className="flex items-center space-x-4 mt-1">
+                                        <div className="flex items-center">
+                                          <FiStar className="w-4 h-4 text-black fill-current" />
+                                          <span className="font-poppins text-sm text-black ml-1">
+                                            {bid.rating}
+                                          </span>
+                                        </div>
+                                        <div className="flex items-center text-gray-500">
+                                          <FiAward className="w-4 h-4 mr-1" />
+                                          <span className="font-poppins text-xs">
+                                            {bid.completedJobs} jobs
+                                          </span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div className="text-right">
+                                    <p className="font-caveat text-2xl font-bold text-black">
+                                      {bid.amount}
+                                    </p>
+                                    <div className="flex items-center justify-end text-gray-500 mt-1">
+                                      <FiClock className="w-3 h-3 mr-1" />
+                                      <p className="font-poppins text-xs">{bid.duration}</p>
+                                    </div>
+                                  </div>
+                                </div>
+                                <p className="font-poppins text-sm text-gray-700 mt-4 mb-4">
+                                  {bid.proposal}
+                                </p>
+                                <div className="flex flex-col sm:flex-row gap-3">
+                                  <button
+                                    className="flex-1 py-2 bg-black text-white font-poppins text-sm rounded-[10px] hover:bg-gray-800 transition-colors"
+                                  >
+                                    Accept Bid & Hire
+                                  </button>
+                                  <Link 
+                                    to="/client/messages"
+                                    className="flex-1 py-2 bg-[#F8F8F8] text-black font-poppins text-sm rounded-[10px] border border-[#EDEDED] hover:bg-[#EDEDED] transition-colors flex items-center justify-center">
+                                    <FiMessageSquare className="w-4 h-4 mr-2" />
+                                    Message
+                                  </Link>
+                                </div>
+                              </RoundedCard>
+                            ))
+                          ) : (
+                             <p className="text-gray-500 font-poppins text-sm">No bids received yet.</p>
+                          )}
+                        </div>
+                       </div>
+                    ) : (
+                      <div>
+                        <h3 className="font-caveat text-2xl font-bold text-black mb-4">
+                          Project Milestones
+                        </h3>
+                        <MilestoneTracker
+                          milestones={selectedProject.milestones || []}
+                          onApprove={handleApproveMilestone}
+                          userRole="client"
+                        />
+                      </div>
+                    )}
                   </div>
-                </>
+                </div>
               ) : (
                 <RoundedCard className="p-12 text-center">
                   <p className="font-poppins text-gray-500">
@@ -356,4 +447,4 @@ export function Projects() {
   )
 }
 
-export default Projects
+export default ClientJobs

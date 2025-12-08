@@ -5,6 +5,8 @@ import { BottomNav } from '../../../shared/components/BottomNav'
 import { RoundedCard } from '../../../shared/components/RoundedCard'
 import { FiDollarSign, FiCalendar, FiPlus, FiTrash2 } from 'react-icons/fi'
 import { Select } from '../../../shared/components/Select'
+import { addJob } from '../../../services/mockData'
+import { useUser } from '../../../context/UserContext'
 const categories = [
   'Web Development',
   'Graphic Design',
@@ -19,6 +21,7 @@ const categories = [
 
 export function PostJob() {
   const navigate = useNavigate()
+  const { currentUser } = useUser()
   const [useMilestones, setUseMilestones] = useState(false)
   const [milestones, setMilestones] = useState([
     {
@@ -80,7 +83,29 @@ export function PostJob() {
   }
   const handleSubmit = (e) => {
     e.preventDefault()
-    // Mock submit
+    
+    // Create new job object
+    const newJob = {
+      title: formData.title,
+      description: formData.description,
+      category: formData.category,
+      budget: `₱${parseFloat(formData.budget).toLocaleString()}`, // Format as currency string
+      budgetType: formData.budgetType,
+      deadline: formData.deadline,
+      skills: formData.skills.split(',').map(s => s.trim()), // Convert string to array
+      clientId: currentUser?.id || 'client-1', // Fallback for dev
+      clientName: currentUser?.name || 'Client',
+      posted: 'Just now', // Initial display string
+      
+      // Milestones (if enabled)
+      milestones: useMilestones ? milestones.map(m => ({
+        ...m,
+        amount: `₱${parseFloat(m.amount).toLocaleString()}`,
+        status: 'pending'
+      })) : []
+    }
+
+    addJob(newJob)
     navigate('/client/dashboard')
   }
   return (
