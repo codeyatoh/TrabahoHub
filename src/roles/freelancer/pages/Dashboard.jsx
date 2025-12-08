@@ -22,6 +22,7 @@ import {
   ResponsiveContainer,
   Cell,
 } from 'recharts'
+import angelitoImg from '../../../assets/images/Angelito-Halmain.jpg'
 const stats = [
   {
     icon: FiDollarSign,
@@ -133,7 +134,7 @@ const availableJobs = [
   },
 ]
 const formatCurrency = (value) => `₱${value.toLocaleString()}`
-import angelitoImg from '../../../assets/images/Angelito-Halmain.jpg'
+
 
 // ... existing imports ...
 

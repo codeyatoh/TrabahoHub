@@ -1,22 +1,7 @@
 // Mock API functions for TrabahoHub
 // In production, these would make actual HTTP requests
 
-// Mock data
-const mockJobs = [
-  {
-    id: '1',
-    title: 'Build a sari-sari store inventory app',
-    description: 'Need a simple mobile app to track inventory for my sari-sari store.',
-    budget: '₱15,000',
-    budgetType: 'fixed',
-    category: 'Web Development',
-    skills: ['React Native', 'Firebase'],
-    deadline: '2024-03-30',
-    status: 'active',
-    clientId: '1',
-    createdAt: '2024-02-15',
-  },
-];
+import { mockJobs } from './mockData';
 
 // API Functions
 export async function fetchJobs(filters) {
@@ -78,5 +63,87 @@ export async function updateUserProfile(userId, data) {
     role: 'freelancer',
     location: data.location || 'Cebu City',
     ...data,
+  };
+}
+
+export async function fetchMyAcceptedJobs(freelancerId) {
+  await new Promise((resolve) => setTimeout(resolve, 500));
+  return mockJobs.filter((job) => {
+    // Check if freelancer is exclusively hired
+    const isHired = job.hiredFreelancerId === freelancerId;
+    
+    // Check if freelancer has an accepted bid
+    const hasAcceptedBid = job.bids && job.bids.some(
+      (bid) => bid.freelancerId === freelancerId && bid.status === 'accepted'
+    );
+
+    return isHired || hasAcceptedBid;
+  });
+}
+
+export async function submitWork(jobId, workData) {
+  await new Promise((resolve) => setTimeout(resolve, 800));
+  return {
+    success: true,
+    message: 'Work submitted successfully',
+    data: {
+      ...workData,
+      submittedAt: new Date().toISOString(),
+      status: 'pending_review'
+    }
+  };
+}
+
+export async function fetchTransactions(userId) {
+  await new Promise((resolve) => setTimeout(resolve, 600));
+  // Use hardcoded mock data for now since we can't easily import from mockData
+  // without potentially breaking imports if not done carefully.
+  // Ideally, we should import mockTransactions from mockData.
+  return [
+    {
+      id: 'txn-1',
+      type: 'earning',
+      description: 'Payment for "Mobile App UI/UX Design" - Milestone 1',
+      amount: 5000,
+      status: 'completed',
+      date: '2024-02-10',
+      method: 'Escrow Release',
+    },
+    {
+      id: 'txn-2',
+      type: 'withdrawal',
+      description: 'Withdrawal to GCash',
+      amount: -3000,
+      status: 'completed',
+      date: '2024-02-12',
+      method: 'GCash',
+    },
+     {
+      id: 'txn-3',
+      type: 'earning',
+      description: 'Payment for "Logo Design" - Final',
+      amount: 8000,
+      status: 'pending',
+      date: '2024-02-15',
+      method: 'Escrow Release',
+    },
+  ];
+}
+
+export async function withdrawFunds(userId, amount, method) {
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  return {
+    success: true,
+    message: 'Withdrawal request submitted successfully',
+    data: {
+      id: `txn-${Date.now()}`,
+      userId,
+      type: 'withdrawal',
+      description: `Withdrawal to ${method.name}`,
+      amount: -amount,
+      status: 'pending',
+      date: new Date().toISOString().split('T')[0],
+      method: method.name,
+    }
   };
 }

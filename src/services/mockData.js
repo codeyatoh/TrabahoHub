@@ -150,7 +150,7 @@ export const mockJobs = [
     hiredFreelancerId: 'freelancer-1',
     milestones: [
       {
-        id: 'milestone-1',
+        id: 'm1',
         title: 'User Flow & Wireframes',
         amount: '₱5,000',
         description: 'Complete user flow diagrams and low-fidelity wireframes',
@@ -158,7 +158,7 @@ export const mockJobs = [
         dueDate: '2024-02-10',
       },
       {
-        id: 'milestone-2',
+        id: 'm2',
         title: 'High-Fidelity Mockups',
         amount: '₱7,000',
         description: 'Design all main screens with final UI',
@@ -166,7 +166,7 @@ export const mockJobs = [
         dueDate: '2024-02-20',
       },
       {
-        id: 'milestone-3',
+        id: 'm3',
         title: 'Prototype & Handoff',
         amount: '₱3,000',
         description: 'Interactive prototype and design system documentation',
@@ -201,11 +201,27 @@ export const mockJobs = [
         completedJobs: 34,
         amount: '₱7,500',
         duration: '1 month',
-        proposal: 'Experienced social media manager. I can create engaging content that drives engagement.',
+        proposal: 'Experienced social media manager. I can create engaging content that drives interaction.',
         status: 'pending',
         submittedDate: '2024-01-08',
       },
     ],
+  },
+  {
+    id: 'job-5',
+    title: 'Logo Design - Fixed Price Example',
+    description: 'Need a modern logo for a coffee shop startup.',
+    budget: '₱5,000',
+    budgetType: 'Fixed Price',
+    location: 'Remote',
+    posted: '3 days ago',
+    deadline: '2024-03-20',
+    skills: ['Logo Design', 'Illustrator'],
+    clientId: 'client-1',
+    clientName: 'Aivy Gonzales',
+    status: 'active',
+    hiredFreelancerId: 'freelancer-1',
+    milestones: [], 
   },
 ];
 
@@ -443,4 +459,42 @@ export const getNotificationsByUserId = (userId) => {
 export const getDisputesByStatus = (status) => {
   if (!status) return mockDisputes;
   return mockDisputes.filter((dispute) => dispute.status === status);
+};
+
+// Mock Transactions
+export const mockTransactions = [
+  {
+    id: 'txn-1',
+    userId: 'freelancer-1',
+    type: 'earning',
+    description: 'Payment for "Mobile App UI/UX Design" - Milestone 1',
+    amount: 5000,
+    status: 'completed',
+    date: '2024-02-10',
+    method: 'Escrow Release',
+  },
+  {
+    id: 'txn-2',
+    userId: 'freelancer-1',
+    type: 'withdrawal',
+    description: 'Withdrawal to GCash',
+    amount: -3000,
+    status: 'completed',
+    date: '2024-02-12',
+    method: 'GCash',
+  },
+  {
+    id: 'txn-3',
+    userId: 'freelancer-1',
+    type: 'earning',
+    description: 'Payment for "Logo Design" - Final',
+    amount: 8000,
+    status: 'pending',
+    date: '2024-02-15',
+    method: 'Escrow Release',
+  },
+];
+
+export const getTransactionsByUserId = (userId) => {
+  return mockTransactions.filter((txn) => txn.userId === userId);
 };
