@@ -13,6 +13,7 @@ import { LandingPage } from './pages/LandingPage'
 import ClientDashboard from './roles/client/pages/Dashboard'
 import PostJob from './roles/client/pages/PostJob'
 import ClientProjects from './roles/client/pages/Projects'
+import ClientJobs from './roles/client/pages/ClientJobs'
 import ClientProfile from './roles/client/pages/Profile'
 import ClientNotifications from './roles/client/pages/Notifications'
 import ClientMessages from './roles/client/pages/Messages'
@@ -40,8 +41,12 @@ import { Settings as AdminSettings } from './roles/admin/pages/Settings'
 // Protected Route Component
 // Protected Route Component
 const ProtectedRoute = ({ children, allowedRoles }) => {
-  const { currentUser, isAuthenticated } = useUser();
+  const { currentUser, isAuthenticated, isLoading } = useUser();
   
+  if (isLoading) {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  }
+
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
@@ -70,9 +75,10 @@ function App() {
           {/* Client Routes */}
           <Route path="/client/*" element={
             <ProtectedRoute allowedRoles={['client']}>
-              <Routes>
+                <Routes>
                 <Route path="dashboard" element={<ClientDashboard />} />
                 <Route path="post-job" element={<PostJob />} />
+                <Route path="jobs" element={<ClientJobs />} />
                 <Route path="projects" element={<ClientProjects />} />
                 <Route path="profile" element={<ClientProfile />} />
                 <Route path="notifications" element={<ClientNotifications />} />

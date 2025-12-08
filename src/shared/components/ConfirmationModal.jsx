@@ -1,6 +1,6 @@
-import React from 'react'
-import { RoundedCard } from './RoundedCard'
-import { FiX, FiAlertTriangle } from 'react-icons/fi'
+import React, { Fragment } from 'react'
+import { Dialog, Transition } from '@headlessui/react'
+import { FiAlertTriangle, FiInfo } from 'react-icons/fi'
 import PropTypes from 'prop-types'
 
 export function ConfirmationModal({
@@ -9,81 +9,83 @@ export function ConfirmationModal({
   onConfirm,
   title,
   message,
-  confirmText = 'Confirm',
-  cancelText = 'Cancel',
-  type = 'warning',
-  isLoading = false,
+  confirmLabel = 'Confirm',
+  cancelLabel = 'Cancel',
+  variant = 'primary', // 'primary' | 'danger'
 }) {
-  if (!isOpen) return null
-
-  const getTypeStyles = () => {
-    switch (type) {
-      case 'danger':
-        return {
-          icon: 'text-red-500',
-          button: 'bg-red-500 hover:bg-red-600',
-        }
-      case 'warning':
-        return {
-          icon: 'text-yellow-500',
-          button: 'bg-yellow-500 hover:bg-yellow-600',
-        }
-      case 'info':
-        return {
-          icon: 'text-blue-500',
-          button: 'bg-blue-500 hover:bg-blue-600',
-        }
-    }
-  }
-
-  const styles = getTypeStyles()
-
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <RoundedCard className="w-full max-w-md">
-        <div className="p-6">
-          <div className="flex justify-between items-start mb-6">
-            <div className="flex items-start space-x-3">
-              <div className={styles.icon}>
-                <FiAlertTriangle className="w-6 h-6" />
-              </div>
-              <div>
-                <h2 className="font-caveat text-2xl font-bold text-black">
-                  {title}
-                </h2>
-                <p className="font-poppins text-sm text-gray-600 mt-2">
-                  {message}
-                </p>
-              </div>
-            </div>
-            <button
-              onClick={onClose}
-              disabled={isLoading}
-              className="p-2 hover:bg-[#F8F8F8] rounded-full transition-colors disabled:opacity-50"
-            >
-              <FiX className="w-5 h-5" />
-            </button>
-          </div>
+    <Transition.Root show={isOpen} as={Fragment}>
+      <Dialog as="div" className="relative z-50" onClose={onClose}>
+        <Transition.Child
+          as={Fragment}
+          enter="ease-out duration-300"
+          enterFrom="opacity-0"
+          enterTo="opacity-100"
+          leave="ease-in duration-200"
+          leaveFrom="opacity-100"
+          leaveTo="opacity-0"
+        >
+          <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+        </Transition.Child>
 
-          <div className="flex gap-3">
-            <button
-              onClick={onClose}
-              disabled={isLoading}
-              className="flex-1 py-3 bg-[#F8F8F8] text-black font-poppins text-sm rounded-[10px] border border-[#EDEDED] hover:bg-[#EDEDED] transition-colors disabled:opacity-50"
+        <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+          <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+            <Transition.Child
+              as={Fragment}
+              enter="ease-out duration-300"
+              enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+              enterTo="opacity-100 translate-y-0 sm:scale-100"
+              leave="ease-in duration-200"
+              leaveFrom="opacity-100 translate-y-0 sm:scale-100"
+              leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
-              {cancelText}
-            </button>
-            <button
-              onClick={onConfirm}
-              disabled={isLoading}
-              className={`flex-1 py-3 text-white font-poppins text-sm rounded-[10px] transition-colors disabled:opacity-50 ${styles.button}`}
-            >
-              {isLoading ? 'Processing...' : confirmText}
-            </button>
+              <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+                <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                  <div className="sm:flex sm:items-start">
+                    <div className={`mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full sm:mx-0 sm:h-10 sm:w-10 ${variant === 'danger' ? 'bg-red-100' : 'bg-blue-100'}`}>
+                      {variant === 'danger' ? (
+                        <FiAlertTriangle className="h-6 w-6 text-red-600" aria-hidden="true" />
+                      ) : (
+                        <FiInfo className="h-6 w-6 text-blue-600" aria-hidden="true" />
+                      )}
+                    </div>
+                    <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                      <Dialog.Title as="h3" className="text-base font-semibold leading-6 text-gray-900 font-poppins">
+                        {title}
+                      </Dialog.Title>
+                      <div className="mt-2">
+                        <p className="text-sm text-gray-500 font-poppins">
+                          {message}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                  <button
+                    type="button"
+                    className={`inline-flex w-full justify-center rounded-md px-3 py-2 text-sm font-semibold text-white shadow-sm sm:ml-3 sm:w-auto font-poppins ${variant === 'danger' ? 'bg-red-600 hover:bg-red-500' : 'bg-black hover:bg-gray-800'}`}
+                    onClick={() => {
+                      onConfirm()
+                      onClose()
+                    }}
+                  >
+                    {confirmLabel}
+                  </button>
+                  <button
+                    type="button"
+                    className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto font-poppins"
+                    onClick={onClose}
+                  >
+                    {cancelLabel}
+                  </button>
+                </div>
+              </Dialog.Panel>
+            </Transition.Child>
           </div>
         </div>
-      </RoundedCard>
-    </div>
+      </Dialog>
+    </Transition.Root>
   )
 }
 
@@ -93,8 +95,7 @@ ConfirmationModal.propTypes = {
   onConfirm: PropTypes.func.isRequired,
   title: PropTypes.string.isRequired,
   message: PropTypes.string.isRequired,
-  confirmText: PropTypes.string,
-  cancelText: PropTypes.string,
-  type: PropTypes.oneOf(['danger', 'warning', 'info']),
-  isLoading: PropTypes.bool,
+  confirmLabel: PropTypes.string,
+  cancelLabel: PropTypes.string,
+  variant: PropTypes.oneOf(['primary', 'danger']),
 }

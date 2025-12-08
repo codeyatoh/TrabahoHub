@@ -10,6 +10,7 @@ const UserContext = createContext(undefined);
 
 export function UserProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Load user from localStorage on mount
   useEffect(() => {
@@ -17,6 +18,7 @@ export function UserProvider({ children }) {
     if (savedUser) {
       setCurrentUser(JSON.parse(savedUser));
     }
+    setIsLoading(false);
   }, []);
 
   const login = (email, password) => {
@@ -71,6 +73,7 @@ export function UserProvider({ children }) {
         logout,
         signup,
         isAuthenticated: !!currentUser,
+        isLoading,
       }}
     >
       {children}

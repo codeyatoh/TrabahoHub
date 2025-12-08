@@ -62,14 +62,18 @@ export function RoleDetector() {
 
   return (
     <div className="min-h-screen bg-[#F8F8F8] flex flex-col">
-      {/* Header */}
-      <header className="bg-white border-b border-[#EDEDED] rounded-b-[12px]">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <a href="/" className="font-caveat text-2xl font-bold text-black">
-            ᜆ᜔ᜇᜊᜑᜓᜑᜓᜊ᜔
-          </a>
-        </div>
-      </header>
+      {/* Back Button */}
+      <div className="absolute top-6 left-6">
+        <a 
+          href="/" 
+          className="inline-flex items-center text-sm font-poppins font-medium text-gray-600 hover:text-black transition-colors"
+        >
+          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Back to Landing Page
+        </a>
+      </div>
 
       <div className="flex-1 flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-4xl">

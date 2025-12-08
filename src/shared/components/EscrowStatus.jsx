@@ -49,6 +49,16 @@ export function EscrowStatus({
           title: 'Under Dispute',
           description: 'Admin is reviewing this case',
         }
+      default:
+        // Default fallback to prevent crash
+        return {
+          icon: FiAlertCircle,
+          color: 'text-gray-500',
+          bgColor: 'bg-gray-50',
+          borderColor: 'border-gray-200',
+          title: 'Status Unknown',
+          description: 'Current status is unavailable',
+        }
     }
   }
 

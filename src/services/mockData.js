@@ -145,6 +145,7 @@ export const mockJobs = [
     status: 'in-progress',
     clientId: 'client-1',
     clientName: 'Carlo Mendoza',
+    freelancer: 'Angelito Halmain', // Added for display
     skills: ['Figma', 'UI/UX', 'Mobile Design'],
     escrowStatus: 'funded',
     hiredFreelancerId: 'freelancer-1',
@@ -154,8 +155,13 @@ export const mockJobs = [
         title: 'User Flow & Wireframes',
         amount: '₱5,000',
         description: 'Complete user flow diagrams and low-fidelity wireframes',
-        status: 'approved',
+        status: 'completed', // Changed to completed to test approval flow
         dueDate: '2024-02-10',
+        submission: {
+          link: 'https://figma.com/file/xyz',
+          note: 'Here are the initial wireframes for your review.',
+          date: '2024-02-09',
+        },
       },
       {
         id: 'm2',
@@ -497,4 +503,72 @@ export const mockTransactions = [
 
 export const getTransactionsByUserId = (userId) => {
   return mockTransactions.filter((txn) => txn.userId === userId);
+};
+
+// Client Helper Functions
+export const addJob = (jobData) => {
+  const newJob = {
+    id: `job-${Date.now()}`,
+    posted: new Date().toISOString(), // Use ISO string for consistency
+    status: 'active',
+    bids: [],
+    milestones: [],
+    escrowStatus: 'not-funded',
+    progress: 0,
+    ...jobData,
+  };
+  mockJobs.unshift(newJob); // Add to beginning of array
+  return newJob;
+};
+
+export const getClientStats = (clientId) => {
+  const clientJobs = getJobsByClientId(clientId);
+  
+  // Active Jobs
+  const activeCount = clientJobs.filter(j => j.status === 'active' || j.status === 'in-progress').length;
+  
+  // Total Spent (Mock calculation based on budget of non-active jobs or just sum of all)
+  // For simplicity, let's sum budget of all non-active jobs (assuming they are paid)
+  // Or just a random number + sum of funded escrows
+  // Let's parse the budget string "₱25,000" -> 25000
+  const parseAmount = (str) => {
+    if (!str) return 0;
+    return parseFloat(str.replace(/[₱,]/g, '')) || 0;
+  };
+
+  const totalSpent = clientJobs.reduce((acc, job) => {
+    // Only count if status is completed or in-progress (partial)
+    // This is a rough estimate for the dashboard
+    if (job.status === 'completed' || job.status === 'in-progress') {
+       return acc + parseAmount(job.budget);
+    }
+    return acc;
+  }, 0);
+
+  // Messages count (unread)
+  const conversations = getConversationsByUserId(clientId);
+  const unreadMessages = conversations.reduce((acc, conv) => acc + conv.unreadCount, 0);
+
+  return {
+    activeJobs: activeCount.toString(),
+    totalSpent: `₱${totalSpent.toLocaleString()}`,
+  };
+};
+
+export const updateJob = (jobId, updates) => {
+  const jobIndex = mockJobs.findIndex(j => j.id === jobId);
+  if (jobIndex > -1) {
+    mockJobs[jobIndex] = { ...mockJobs[jobIndex], ...updates };
+    return mockJobs[jobIndex];
+  }
+  return null;
+};
+
+export const deleteJob = (jobId) => {
+  const index = mockJobs.findIndex(j => j.id === jobId);
+  if (index > -1) {
+    mockJobs.splice(index, 1);
+    return true;
+  }
+  return false;
 };
